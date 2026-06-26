@@ -15,3 +15,23 @@ def chunk_list(lst, size):
     for i in range(0, len(lst), size):
         yield lst[i:i + size]
 
+
+# --- 2026-06-26 (2) ---
+def flatten(nested, depth=None):
+    """
+    Recursively flatten a nested list up to an optional depth.
+
+    Example:
+        flatten([1, [2, [3, [4]]]])          # => [1, 2, 3, 4]
+        flatten([1, [2, [3, [4]]]], depth=1) # => [1, 2, [3, [4]]]
+    """
+    result = []
+    for item in nested:
+        # If item is list-like and we haven't hit the depth limit, recurse
+        if isinstance(item, list) and (depth is None or depth > 0):
+            next_depth = None if depth is None else depth - 1
+            result.extend(flatten(item, next_depth))
+        else:
+            result.append(item)
+    return result
+
