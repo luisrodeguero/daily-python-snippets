@@ -35,3 +35,39 @@ def flatten(nested, depth=None):
             result.append(item)
     return result
 
+
+# --- 2026-06-27 ---
+def retry(max_attempts=3, exceptions=(Exception,), delay=0):
+    """
+    Decorator that retries a function on failure.
+
+    Args:
+        max_attempts: Maximum number of attempts before re-raising.
+        exceptions: Tuple of exception types to catch and retry on.
+        delay: Seconds to wait between retries (0 = no wait).
+
+    Example:
+        @retry(max_attempts=3, exceptions=(ConnectionError,), delay=1)
+        def fetch_data(url):
+            ...
+    """
+    import time
+    import functools
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as exc:
+                    last_exc = exc
+                    # Wait before next attempt (skip wait on final attempt)
+                    if delay > 0 and attempt < max_attempts:
+                        time.sleep(delay)
+            # All attempts exhausted — re-raise the last exception
+            raise last_exc
+        return wrapper
+    return decorator
+
