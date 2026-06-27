@@ -71,3 +71,43 @@ def retry(max_attempts=3, exceptions=(Exception,), delay=0):
         return wrapper
     return decorator
 
+
+# --- 2026-06-27 ---
+def levenshtein_distance(s1, s2):
+    """
+    Compute the Levenshtein (edit) distance between two strings.
+
+    The edit distance is the minimum number of single-character operations
+    (insertions, deletions, substitutions) required to transform s1 into s2.
+
+    Example:
+        levenshtein_distance("kitten", "sitting")  # => 3
+        levenshtein_distance("flaw", "lawn")        # => 2
+        levenshtein_distance("", "abc")             # => 3
+    """
+    m, n = len(s1), len(s2)
+
+    # dp[i][j] = edit distance between s1[:i] and s2[:j]
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+    # Base cases: transforming empty string to s2[:j] costs j insertions
+    for i in range(m + 1):
+        dp[i][0] = i  # delete all chars from s1
+    for j in range(n + 1):
+        dp[0][j] = j  # insert all chars of s2
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if s1[i - 1] == s2[j - 1]:
+                # Characters match — no extra cost
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                # Min cost among: substitute, delete from s1, insert from s2
+                dp[i][j] = 1 + min(
+                    dp[i - 1][j - 1],  # substitution
+                    dp[i - 1][j],      # deletion
+                    dp[i][j - 1],      # insertion
+                )
+
+    return dp[m][n]
+
