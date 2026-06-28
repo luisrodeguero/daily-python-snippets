@@ -190,3 +190,36 @@ def camel_to_snake(name):
     s2 = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s1)
     return s2.lower()
 
+
+# --- 2026-06-28 ---
+def retry(times=3, exceptions=(Exception,), delay=0):
+    """Decorator that retries a function on failure.
+
+    Args:
+        times:      Maximum number of attempts (default 3).
+        exceptions: Tuple of exception types to catch (default all).
+        delay:      Seconds to wait between retries (default 0).
+
+    Example:
+        @retry(times=5, exceptions=(IOError,), delay=1)
+        def fetch_data(url):
+            ...
+    """
+    import time
+    import functools
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1, times + 1):
+                try:
+                    return func(*args, **kwargs)  # success — return immediately
+                except exceptions as exc:
+                    last_exc = exc
+                    if attempt < times and delay:
+                        time.sleep(delay)  # wait before next try
+            raise last_exc  # all attempts exhausted — re-raise the last error
+        return wrapper
+    return decorator
+
