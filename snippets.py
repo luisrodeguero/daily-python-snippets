@@ -223,3 +223,27 @@ def retry(times=3, exceptions=(Exception,), delay=0):
         return wrapper
     return decorator
 
+
+# --- 2026-06-28 ---
+def sliding_window(iterable, n):
+    """Yield successive overlapping windows of size n from an iterable.
+
+    Args:
+        iterable: Any iterable (list, string, generator, …).
+        n:        Window size (must be >= 1).
+
+    Yields:
+        Tuples of length n representing each consecutive window.
+
+    Example:
+        list(sliding_window([1, 2, 3, 4, 5], 3))
+        # => [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
+    """
+    from collections import deque
+
+    window = deque(maxlen=n)  # fixed-size buffer — oldest element is evicted automatically
+    for item in iterable:
+        window.append(item)
+        if len(window) == n:
+            yield tuple(window)  # only emit once the window is full
+
