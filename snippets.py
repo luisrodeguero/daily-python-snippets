@@ -144,3 +144,26 @@ def retry(max_attempts=3, delay=1.0, exceptions=(Exception,)):
         return wrapper
     return decorator
 
+
+# --- 2026-06-28 ---
+def deep_merge(base, override):
+    """
+    Recursively merge two dicts, with override values winning.
+    Unlike {**base, **override}, this merges nested dicts instead
+    of replacing them wholesale.
+
+    Example:
+        base     = {'a': 1, 'b': {'x': 10, 'y': 20}}
+        override = {'b': {'y': 99, 'z': 30}, 'c': 3}
+        deep_merge(base, override)
+        # => {'a': 1, 'b': {'x': 10, 'y': 99, 'z': 30}, 'c': 3}
+    """
+    result = dict(base)  # shallow copy so we don't mutate the original
+    for key, val in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(val, dict):
+            # Both sides are dicts — recurse instead of overwriting
+            result[key] = deep_merge(result[key], val)
+        else:
+            result[key] = val  # scalar or new key — just overwrite
+    return result
+
