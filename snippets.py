@@ -167,3 +167,26 @@ def deep_merge(base, override):
             result[key] = val  # scalar or new key — just overwrite
     return result
 
+
+# --- 2026-06-28 ---
+def camel_to_snake(name):
+    """Convert a camelCase or PascalCase string to snake_case.
+
+    Args:
+        name: A camelCase or PascalCase identifier string.
+
+    Returns:
+        The snake_case equivalent string.
+
+    Example:
+        camel_to_snake('myVariableName')  # => 'my_variable_name'
+        camel_to_snake('HTMLParser')      # => 'html_parser'
+    """
+    import re
+    # Insert underscore between a lowercase letter (or digit) followed by an uppercase letter
+    s1 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name)
+    # Insert underscore between consecutive uppercase letters followed by a lowercase letter
+    # e.g. 'HTMLParser' -> 'HTML_Parser' before lowercasing
+    s2 = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s1)
+    return s2.lower()
+
