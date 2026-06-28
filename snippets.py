@@ -111,3 +111,36 @@ def levenshtein_distance(s1, s2):
 
     return dp[m][n]
 
+
+# --- 2026-06-28 ---
+import time
+import functools
+
+def retry(max_attempts=3, delay=1.0, exceptions=(Exception,)):
+    """Decorator that retries a function on failure.
+
+    Args:
+        max_attempts: Maximum number of times to call the function.
+        delay: Seconds to wait between attempts.
+        exceptions: Tuple of exception types that trigger a retry.
+
+    Example:
+        @retry(max_attempts=5, delay=0.5, exceptions=(ConnectionError,))
+        def fetch_data(url):
+            ...
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as exc:
+                    last_exc = exc
+                    if attempt < max_attempts:
+                        time.sleep(delay)  # pause before next attempt
+            raise last_exc  # all attempts exhausted — re-raise last error
+        return wrapper
+    return decorator
+
