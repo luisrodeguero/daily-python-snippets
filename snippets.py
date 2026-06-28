@@ -247,3 +247,33 @@ def sliding_window(iterable, n):
         if len(window) == n:
             yield tuple(window)  # only emit once the window is full
 
+
+# --- 2026-06-28 ---
+def flatten(nested, depth=None):
+    """Recursively flatten a nested list (or any iterable) to a single list.
+
+    Args:
+        nested: A (possibly nested) iterable to flatten.
+        depth:  How many levels deep to flatten. None means fully flatten.
+
+    Returns:
+        A flat list of all leaf elements.
+
+    Example:
+        flatten([1, [2, [3, [4]]], 5])        # => [1, 2, 3, 4, 5]
+        flatten([1, [2, [3, [4]]], 5], depth=1) # => [1, 2, [3, [4]], 5]
+    """
+    result = []
+    for item in nested:
+        # Recurse if item is a non-string iterable and depth budget remains
+        if hasattr(item, '__iter__') and not isinstance(item, (str, bytes)):
+            if depth is None:
+                result.extend(flatten(item, depth=None))      # unlimited depth
+            elif depth > 0:
+                result.extend(flatten(item, depth=depth - 1)) # reduce remaining depth
+            else:
+                result.append(item)  # depth exhausted — treat as leaf
+        else:
+            result.append(item)  # scalar or string — always a leaf
+    return result
+
