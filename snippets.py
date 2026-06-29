@@ -277,3 +277,28 @@ def flatten(nested, depth=None):
             result.append(item)  # scalar or string — always a leaf
     return result
 
+
+# --- 2026-06-29 (1/4) ---
+def camel_to_snake(name):
+    """Convert a camelCase or PascalCase string to snake_case.
+
+    Args:
+        name: The camelCase or PascalCase string to convert.
+
+    Returns:
+        The snake_case equivalent string.
+
+    Example:
+        >>> camel_to_snake('myVariableName')
+        'my_variable_name'
+        >>> camel_to_snake('HTMLParser')
+        'h_t_m_l_parser'
+    """
+    import re
+    # Insert underscore before any uppercase letter that follows a lowercase letter or digit
+    s1 = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name)
+    # Insert underscore before any uppercase letter that is followed by a lowercase letter
+    # (handles runs like 'HTML' -> 'H_T_M_L' edge cases)
+    result = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s1)
+    return result.lower()
+
