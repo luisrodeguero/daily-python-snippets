@@ -372,3 +372,45 @@ def retry(max_attempts=3, delay=1.0, exceptions=(Exception,)):
         return wrapper
     return decorator
 
+
+# --- 2026-06-29 (4/4) ---
+def sliding_window(iterable, size, step=1):
+    """Yield successive overlapping (or non-overlapping) windows from an iterable.
+
+    Args:
+        iterable: Any iterable to slide over.
+        size:     Number of elements in each window.
+        step:     Number of positions to advance between windows (default 1).
+
+    Yields:
+        Tuples of length *size* drawn from the iterable.
+
+    Example:
+        >>> list(sliding_window(range(6), size=3))
+        [(0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
+        >>> list(sliding_window(range(6), size=3, step=2))
+        [(0, 1, 2), (2, 3, 4)]
+    """
+    from collections import deque
+
+    it = iter(iterable)
+    window = deque(maxlen=size)
+
+    # Seed the window with the first *size* elements
+    for _ in range(size):
+        try:
+            window.append(next(it))
+        except StopIteration:
+            return  # iterable shorter than window — yield nothing
+
+    yield tuple(window)
+
+    # Slide forward *step* positions at a time
+    advance = 0
+    for item in it:
+        window.append(item)   # deque auto-discards oldest when maxlen reached
+        advance += 1
+        if advance == step:
+            yield tuple(window)
+            advance = 0
+
