@@ -302,3 +302,37 @@ def camel_to_snake(name):
     result = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s1)
     return result.lower()
 
+
+# --- 2026-06-29 (2/4) ---
+def sieve_of_eratosthenes(limit):
+    """Return a list of all prime numbers up to and including *limit*.
+
+    Uses the classic Sieve of Eratosthenes algorithm with O(n log log n)
+    time complexity and O(n) space complexity.
+
+    Args:
+        limit: Upper bound (inclusive) to search for primes. Must be >= 2.
+
+    Returns:
+        A sorted list of prime integers <= limit.
+
+    Example:
+        >>> sieve_of_eratosthenes(30)
+        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    """
+    if limit < 2:
+        return []
+
+    # Boolean sieve: index i is True if i is (still) considered prime
+    is_prime = [True] * (limit + 1)
+    is_prime[0] = is_prime[1] = False  # 0 and 1 are not prime
+
+    # Only need to test up to sqrt(limit)
+    for start in range(2, int(limit ** 0.5) + 1):
+        if is_prime[start]:
+            # Mark all multiples of start as composite
+            for multiple in range(start * start, limit + 1, start):
+                is_prime[multiple] = False
+
+    return [n for n, prime in enumerate(is_prime) if prime]
+
