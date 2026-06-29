@@ -336,3 +336,39 @@ def sieve_of_eratosthenes(limit):
 
     return [n for n, prime in enumerate(is_prime) if prime]
 
+
+# --- 2026-06-29 (3/4) ---
+import time
+import functools
+
+def retry(max_attempts=3, delay=1.0, exceptions=(Exception,)):
+    """Decorator that retries a function on failure.
+
+    Args:
+        max_attempts: Maximum number of attempts before re-raising (default 3).
+        delay:        Seconds to wait between attempts (default 1.0).
+        exceptions:   Tuple of exception types to catch (default catches all).
+
+    Returns:
+        Decorator that wraps the target function with retry logic.
+
+    Example:
+        @retry(max_attempts=5, delay=2.0, exceptions=(ConnectionError,))
+        def fetch_data(url):
+            ...
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return func(*args, **kwargs)          # success — return immediately
+                except exceptions as exc:
+                    last_exc = exc
+                    if attempt < max_attempts:
+                        time.sleep(delay)                 # wait before retrying
+            raise last_exc                                # all attempts exhausted
+        return wrapper
+    return decorator
+
