@@ -487,3 +487,27 @@ def chunk_list(lst, size):
     for i in range(0, len(lst), size):
         yield lst[i : i + size]  # Slice out the next chunk
 
+
+# --- 2026-06-30 ---
+def memoize(func):
+    """Simple memoization decorator that caches results by positional arguments.
+
+    Stores results in a dict keyed by args tuple. Unlike functools.lru_cache
+    this cache is unbounded and accessible via func.cache for inspection/clearing.
+
+    Example:
+        @memoize
+        def fib(n):
+            return n if n < 2 else fib(n - 1) + fib(n - 2)
+    """
+    cache = {}
+
+    def wrapper(*args):
+        if args not in cache:
+            cache[args] = func(*args)  # Compute and store on first call
+        return cache[args]
+
+    wrapper.cache = cache  # Expose cache for debugging or manual invalidation
+    wrapper.__wrapped__ = func  # Preserve access to the original function
+    return wrapper
+
