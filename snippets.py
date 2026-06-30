@@ -414,3 +414,32 @@ def sliding_window(iterable, size, step=1):
             yield tuple(window)
             advance = 0
 
+
+# --- 2026-06-30 ---
+import time
+import functools
+
+def retry_with_backoff(max_retries=3, base_delay=1.0, exceptions=(Exception,)):
+    """Decorator that retries a function on failure with exponential backoff.
+
+    Args:
+        max_retries: Maximum number of retry attempts.
+        base_delay: Initial delay in seconds (doubles each retry).
+        exceptions: Tuple of exception types that trigger a retry.
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            delay = base_delay
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    if attempt == max_retries:
+                        raise  # Re-raise on final attempt
+                    time.sleep(delay)
+                    delay *= 2  # Exponential backoff
+            return None
+        return wrapper
+    return decorator
+
