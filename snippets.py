@@ -443,3 +443,26 @@ def retry_with_backoff(max_retries=3, base_delay=1.0, exceptions=(Exception,)):
         return wrapper
     return decorator
 
+
+# --- 2026-06-30 ---
+def flatten_dict(d, parent_key='', sep='.'):
+    """Flatten a nested dictionary into a single-level dict with dotted keys.
+
+    Args:
+        d: The (possibly nested) dictionary to flatten.
+        parent_key: Prefix accumulated from parent levels (used in recursion).
+        sep: Separator between key levels in the output.
+
+    Example:
+        >>> flatten_dict({'a': {'b': 1, 'c': {'d': 2}}, 'e': 3})
+        {'a.b': 1, 'a.c.d': 2, 'e': 3}
+    """
+    items = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k  # Build dotted path
+        if isinstance(v, dict):
+            items.update(flatten_dict(v, new_key, sep=sep))  # Recurse into nested dicts
+        else:
+            items[new_key] = v
+    return items
+
