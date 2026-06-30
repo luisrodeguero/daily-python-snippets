@@ -466,3 +466,24 @@ def flatten_dict(d, parent_key='', sep='.'):
             items[new_key] = v
     return items
 
+
+# --- 2026-06-30 ---
+def chunk_list(lst, size):
+    """Split a list into fixed-size chunks (last chunk may be smaller).
+
+    Args:
+        lst: The list to split.
+        size: Maximum number of elements per chunk.
+
+    Yields:
+        Successive sublists of length *size*.
+
+    Example:
+        >>> list(chunk_list(range(10), 3))
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+    """
+    if size <= 0:
+        raise ValueError("Chunk size must be a positive integer")
+    for i in range(0, len(lst), size):
+        yield lst[i : i + size]  # Slice out the next chunk
+
